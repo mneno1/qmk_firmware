@@ -23,7 +23,12 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 3. QMK CLI を最新版にアップグレード
+      - name: Install ARM toolchain
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-arm-none-eabi binutils-arm-none-eabi
+    
+    # 3. QMK CLI を最新版にアップグレード
       - name: Install QMK CLI
         run: |
           python -m pip install --upgrade pip
@@ -53,4 +58,5 @@ jobs:
         with:
           name: keyball44-via
           path: dist/*
+
 
