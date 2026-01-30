@@ -4,45 +4,41 @@ on:
   push:
     branches:
       - hk-master
-  pull_request:
-    branches:
-      - hk-master
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    # QMK CLI 公式コンテナを使用
-    container:
-      image: ghcr.io/qmk/qmk_cli:latest
-
     steps:
+      # 1. リポジトリをチェックアウト
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
-          ref: hk-master
           submodules: recursive
 
-      # GitHub Actions + container でよく出る安全対策
-      - name: Configure git
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      # 2. Python 3.9 をセットアップ
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-      - name: Show QMK info (debug)
+      # 3. QMK CLI を最新版にアップグレード
+      - name: Install QMK CLI
         run: |
-          qmk doctor || true
-          qmk list-keyboards | grep keyball || true
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade qmk
 
-      # ★ ここを自分のモデル・keymap に合わせて変更
-      - name: Build Keyball firmware
+      # 4. QMK Doctor（エラー無視）
+      - name: Run QMK Doctor
+        run: qmk doctor || true
+
+      # 5. Keyball44 を via キーマップでビルド
+      - name: Build Keyball44 Firmware
         run: |
-          qmk compile \
-            -kb keyball/keyball44 \
-            -km via
-            -o
+          qmk compile -kb keyball/keyball44 -km via -o
 
-      # ★ ビルドファイルを分かりやすくリネームして dist に移動（タイムスタンプ）
+      # 6. ビルドファイルをタイムスタンプ付きで dist に移動
       - name: Prepare firmware artifact
         run: |
           mkdir -p dist
@@ -51,10 +47,9 @@ jobs:
             mv "$f" "dist/keyball44_via_${TIMESTAMP}.uf2"
           done
 
-      # ★ artifact としてアップロード
+      # 7. Artifact としてアップロード
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: keyball44-via
           path: dist/*
-
