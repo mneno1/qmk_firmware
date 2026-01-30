@@ -1,0 +1,59 @@
+name: Build Keyball Firmware
+
+on:
+  push:
+    branches:
+      - hk-master
+  pull_request:
+    branches:
+      - hk-master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # QMK CLI 公式コンテナを使用
+    container:
+      image: ghcr.io/qmk/qmk_cli:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: hk-master
+          submodules: recursive
+
+      # GitHub Actions + container でよく出る安全対策
+      - name: Configure git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Show QMK info (debug)
+        run: |
+          qmk doctor
+          qmk list-keyboards | grep keyball || true
+
+      # ★ ここを自分のモデル・keymap に合わせて変更
+      - name: Build Keyball firmware
+        run: |
+          qmk compile \
+            -kb keyball/keyball44 \
+            -km via
+            -o
+
+      # ★ ビルドファイルを分かりやすくリネームして dist に移動（タイムスタンプ）
+      - name: Prepare firmware artifact
+        run: |
+          mkdir -p dist
+          TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+          for f in *.uf2; do
+            mv "$f" "dist/keyball44_via_${TIMESTAMP}.uf2"
+          done
+
+      # ★ artifact としてアップロード
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyball44-via
+          path: dist/*
