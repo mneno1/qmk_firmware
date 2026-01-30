@@ -1,10 +1,17 @@
 name: Build Keyball Firmware
 
+# push や pull_request は削除して workflow_dispatch のみ
 on:
-  push:
-    branches:
-      - hk-master
   workflow_dispatch:
+    inputs:
+      keyboard:
+        description: 'Keyboard to build'
+        default: 'keyball/keyball44'
+        required: true
+      keymap:
+        description: 'Keymap to use'
+        default: 'via'
+        required: true
 
 jobs:
   build:
@@ -58,5 +65,6 @@ jobs:
         with:
           name: keyball44-via
           path: dist/*
+
 
 
