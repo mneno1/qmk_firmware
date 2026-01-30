@@ -31,7 +31,7 @@ jobs:
 
       - name: Show QMK info (debug)
         run: |
-          qmk doctor
+          qmk doctor || true
           qmk list-keyboards | grep keyball || true
 
       # ★ ここを自分のモデル・keymap に合わせて変更
@@ -57,3 +57,4 @@ jobs:
         with:
           name: keyball44-via
           path: dist/*
+
