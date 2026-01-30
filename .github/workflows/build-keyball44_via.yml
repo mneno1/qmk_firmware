@@ -36,7 +36,7 @@ jobs:
       # 5. Keyball44 を via キーマップでビルド
       - name: Build Keyball44 Firmware
         run: |
-          qmk compile -kb keyball/keyball44 -km via -o
+          qmk compile -kb keyball/keyball44 -km via
 
       # 6. ビルドファイルをタイムスタンプ付きで dist に移動
       - name: Prepare firmware artifact
@@ -53,3 +53,4 @@ jobs:
         with:
           name: keyball44-via
           path: dist/*
+
