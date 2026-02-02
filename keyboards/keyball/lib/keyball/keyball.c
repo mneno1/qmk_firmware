@@ -202,6 +202,11 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(report_mouse_
             break;
     }
 #endif
+#ifdef SCROLL_MODE_INVERT_XY
+    // スクロール方向を反転
+    output->h = -output->h;
+    output->v = -output->v;
+#endif // SCROLL_MODE_INVERT_XY
 }
 
 static void motion_to_mouse(report_mouse_t *report, report_mouse_t *output, bool is_left, bool as_scroll) {
