@@ -248,6 +248,7 @@ float scroll_accumulated_v = 0;
 
 static void calc_scroll_values(report_mouse_t *report, report_mouse_t *output);
 static void calc_scroll_values(report_mouse_t *report, report_mouse_t *output) {
+    aaa
     // Calculate and accumulate scroll values based on mouse movement and divisors
     scroll_accumulated_h += (float)report->x / SCROLL_DIVISOR_H;
     scroll_accumulated_v += (float)report->y / SCROLL_DIVISOR_V;
