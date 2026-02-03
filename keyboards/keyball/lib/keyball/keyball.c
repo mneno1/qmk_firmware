@@ -62,6 +62,7 @@ __attribute__((weak)) void keyball_on_adjust_layout(keyball_adjust_t v) {}
 //////////////////////////////////////////////////////////////////////////////
 // Static utilities
 
+#ifndef SCROLL_MODE_TEST
 // divmod16 divides *v by div, returns the quotient, and assigns the remainder
 // to *v.
 static mouse_xy_report_t divmod16(mouse_xy_report_t *v, int16_t div) {
@@ -69,6 +70,7 @@ static mouse_xy_report_t divmod16(mouse_xy_report_t *v, int16_t div) {
     *v -= r * div;
     return r;
 }
+#endif // SCROLL_MODE_TEST
 
 // clip2int8 clips an integer fit into int8_t.
 static inline int8_t clip2int8(int16_t v) {
