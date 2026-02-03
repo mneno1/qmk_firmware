@@ -157,6 +157,7 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_move(report_mouse_t 
 }
 
 __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(report_mouse_t *report, report_mouse_t *output, bool is_left) {
+#ifndef SCROLL_MODE_TEST
     // consume motion of trackball.
     int16_t div = 1 << (keyball_get_scroll_div() - 1);
     int16_t x = divmod16(&report->x, div);
@@ -202,6 +203,10 @@ __attribute__((weak)) void keyball_on_apply_motion_to_mouse_scroll(report_mouse_
             break;
     }
 #endif
+#else // SCROLL_MODE_TEST
+    calc_scroll_values(report, output);
+#endif // SCROLL_MODE_TEST
+
 #ifdef SCROLL_MODE_INVERT_XY
     // スクロール方向を反転
     output->h = -output->h;
@@ -231,6 +236,36 @@ report_mouse_t pointing_device_task_combined_kb(report_mouse_t left_report, repo
     keyball.last_mouse = output;
     return output;
 }
+
+#ifdef SCROLL_MODE_TEST
+// Modify these values to adjust the scrolling speed
+#define SCROLL_DIVISOR_H 8.0
+#define SCROLL_DIVISOR_V 8.0
+
+// Variables to store accumulated scroll values
+float scroll_accumulated_h = 0;
+float scroll_accumulated_v = 0;
+
+static void calc_scroll_values(report_mouse_t *report, report_mouse_t *output);
+static void calc_scroll_values(report_mouse_t *report, report_mouse_t *output) {
+    // Calculate and accumulate scroll values based on mouse movement and divisors
+    scroll_accumulated_h += (float)report->x / SCROLL_DIVISOR_H;
+    scroll_accumulated_v += (float)report->y / SCROLL_DIVISOR_V;
+
+    // Assign integer parts of accumulated scroll values to the mouse report
+    output->h = (int8_t)scroll_accumulated_h;
+    output->v = (int8_t)scroll_accumulated_v;
+
+    // Update accumulated scroll values by subtracting the integer parts
+    scroll_accumulated_h -= (int8_t)scroll_accumulated_h;
+    scroll_accumulated_v -= (int8_t)scroll_accumulated_v;
+
+    // Clear the X and Y values of the mouse report
+    output->x = 0;
+    output->y = 0;
+}
+
+#endif // SCROLL_MODE_TEST
 
 //////////////////////////////////////////////////////////////////////////////
 // Split RPC
