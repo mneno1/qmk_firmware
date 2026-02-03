@@ -40,4 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AUTO_MOUSE_TIME 1000
 #define SCROLL_MODE_LAYER 7
 
+#define SCROLL_MODE_INVERT_XY
+#define SCROLL_MODE_TEST
+
 #define DYNAMIC_KEYMAP_LAYER_COUNT 8
